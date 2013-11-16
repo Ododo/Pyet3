@@ -3,8 +3,7 @@
 #include <iostream>
 #include <cstdarg>
 
-#include "./include/main.hpp"
-#include "./include/ettools.hpp"
+#include "../include/main.hpp"
 
 using namespace boost;
 
@@ -32,11 +31,8 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
         pyet = python::import("pyetw");
     }
 
-    else{
+    python::object wrapper = pyet.attr("Wrapper")(command,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
 
-     python::object wrapper = pyet.attr("Wrapper")(command,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
-
-    }
     }
     catch(...)
         {
@@ -135,12 +131,24 @@ int EtCaller::et_argc(){
 
 char const* EtCaller::et_argv(int i){
     char buff[1024];
-    Pyet_syscall( G_ARGV,  buff, sizeof(buff));
+    Pyet_syscall( G_ARGV, i, buff, sizeof(buff));
     return buff;
 }
+
+
+uintptr_t EtCaller::et_Cvar_Register(char const* name, char const* value, int flags){
+
+    vmCvar_t *cvar;
+    Pyet_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
+    return (uintptr_t)&cvar;
+}
+
+char const* EtCaller::et_Cvar_Update(uintptr_t addr){
+    vmCvar_t* cvar = (vmCvar_t*)addr;
+    Pyet_syscall(G_CVAR_UPDATE, cvar);
+    return cvar->string;
+}
 ///*****///
-
-
 
 using namespace boost::python;
 BOOST_PYTHON_MODULE(pyet)
@@ -158,6 +166,8 @@ BOOST_PYTHON_MODULE(pyet)
         .def("DropClient", &EtCaller::et_DropCLient)
         .def("GetUserInfo", &EtCaller::et_GetUserInfo)
         .def("SetUserInfo", &EtCaller::et_SetUserInfo)
-        .def("argc", &EtCaller::et_argc);
-        //.def("argv", &EtCaller::et_argv);
+        .def("argc", &EtCaller::et_argc)
+        .def("argv", &EtCaller::et_argv);
+        //.def("RegisterCvar", &EtCaller::et_Cvar_Register)
+        //.def("UpdateCvar", &EtCaller::et_Cvar_Update);
 }

@@ -1,3 +1,5 @@
+#include "../include/ettools.hpp"
+
 class EtCaller
 {
     public:
@@ -15,6 +17,8 @@ class EtCaller
     int et_SetUserInfo(int client, char const* userinfo);
     int et_argc();
     char const* et_argv(int i);
+    uintptr_t et_Cvar_Register(char const* name, char const* value, int flags);
+    char const* et_Cvar_Update(uintptr_t addr);
 };
 
 class EtTools

@@ -20,6 +20,9 @@ void dllEntry( int (*syscallptr)( int arg,... ) ) {
         mode_dllEntry(syscallptr);
         pyet_dllEntry(syscallptr);
     }
+    else{
+        std::cout << "mode.so or pyet.so not found" << std::endl;
+    }
 
 }
 

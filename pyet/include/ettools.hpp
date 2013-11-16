@@ -7,9 +7,8 @@
 __attribute__((format(printf,1,2)))
 char * va(char *format, ...);
 
-typedef int	cvarHandle_t;
 typedef struct {
-	cvarHandle_t	handle;
+	int	        handle;
 	int			modificationCount;
 	float		value;
 	int			integer;

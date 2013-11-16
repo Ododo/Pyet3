@@ -21,3 +21,20 @@
 	<cstring>
 	<cstdarg>
 
+1384545516 source:/home/olivier/Bureau/pyet/pyet/src/ettools.cpp
+	<cstdio>
+	<cstring>
+	<cstdarg>
+
+1384622221 source:/home/olivier/Bureau/pyet/pyet/src/main.cpp
+	<boost/python.hpp>
+	<dlfcn.h>
+	<iostream>
+	<cstdarg>
+	"../include/main.hpp"
+
+1384621516 /home/olivier/Bureau/pyet/pyet/include/main.hpp
+	"../include/ettools.hpp"
+
+1384622213 /home/olivier/Bureau/pyet/pyet/include/ettools.hpp
+

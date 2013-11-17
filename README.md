@@ -24,6 +24,14 @@ How To
        see addons/example.py
        
        
+Communicate with pyet through the Console
+========
+pyet_load [group] or pl [group] : load a group of addons.
+pyet_unload [group] or pu[group] : unload a group of addons.
+pyet_list or ps : list all the addons loaded.
+
+       
+       
   
 Doc
 ======

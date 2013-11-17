@@ -40,7 +40,7 @@ This api is very similar to LUA api, doc can be easily found on web.
 The plugin is still in development, this is the list of features available at the moment:
 
     Events
-        Triggered events from ET. (to implement)
+        Events from server. (to implement)
     ======
     
     pyetw.Addon.

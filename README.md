@@ -25,6 +25,7 @@ How To
     -Create a file in this directory , for example my_first_addon.py .
     -In this file, create a class inherited from pyetw.Addon.
        see addons/example.py
+    -add 'import yourmodule' to addons/__init__.py
        
        
 Communicate with pyet through the Console

@@ -40,7 +40,7 @@ Communicate with pyet through the Console
 Doc
 ======
 (provisional documentation)
-This api is very similar to LUA api, doc can be easily found on web.
+This api is very similar to LUA api, doc can easily be found on web.
 The plugin is still in development, this is the list of features available at the moment:
 
     Events

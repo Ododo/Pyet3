@@ -77,7 +77,7 @@ The plugin is still in development, this is the list of features available at th
          SetValueForKey(infostring, key, value) //str,str,str returns str (infostring)
          
          
-        
+    Constants from ET can be found in EtConstants.py    
         
         
     

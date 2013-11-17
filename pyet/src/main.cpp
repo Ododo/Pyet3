@@ -67,10 +67,11 @@ int EtCaller::et_gError(char const* msg){
     return 1;
 }
 
-char const* EtCaller::et_Cvar_Get(char const* cvar){
+std::string EtCaller::et_Cvar_Get(char const* cvar){
     char buff[256];
     Pyet_syscall(G_CVAR_VARIABLE_STRING_BUFFER, cvar, buff, sizeof(buff));
-    return buff;
+    std::string str(buff);
+    return str;
 }
 
 int EtCaller::et_Cvar_Set(char const* cvar, char const* value){
@@ -78,11 +79,12 @@ int EtCaller::et_Cvar_Set(char const* cvar, char const* value){
     return 1;
 }
 
-char const* EtCaller::et_getConfigString(int i){
+std::string EtCaller::et_getConfigString(int i){
     char buff[256];
     ///UNSAFE
     Pyet_syscall( G_GET_CONFIGSTRING, i, buff, sizeof(buff));
-    return buff;
+    std::string str(buff);
+    return str;
 }
 
 int EtCaller::et_setConfigString(int i, char const* cvs){
@@ -114,10 +116,11 @@ int EtCaller::et_DropCLient(int client, char const* reason, int length) {
     return 1;
 }
 
-char const* EtCaller::et_GetUserInfo(int client) {
+std::string EtCaller::et_GetUserInfo(int client) {
     char userinfo[1024];
     Pyet_syscall( G_GET_USERINFO, client, userinfo, sizeof(userinfo));
-    return userinfo;
+    std::string str(userinfo);
+    return str;
 }
 
 int EtCaller::et_SetUserInfo(int client, char const* userinfo){
@@ -129,26 +132,46 @@ int EtCaller::et_argc(){
     return Pyet_syscall( G_ARGC );
 }
 
-char const* EtCaller::et_argv(int i){
+std::string EtCaller::et_argv(int i){
     char buff[1024];
     Pyet_syscall( G_ARGV, i, buff, sizeof(buff));
-    return buff;
+    std::string str(buff);
+    return str;
 }
 
+//uintptr_t EtCaller::et_Cvar_Register(char const* name, char const* value, int flags){
 
-uintptr_t EtCaller::et_Cvar_Register(char const* name, char const* value, int flags){
+//    vmCvar_t *cvar;
+//    Pyet_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
+//    return (uintptr_t)&cvar;
+// }
 
-    vmCvar_t *cvar;
-    Pyet_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
-    return (uintptr_t)&cvar;
+// char const* EtCaller::et_Cvar_Update(uintptr_t addr){
+//     vmCvar_t* cvar = (vmCvar_t*)addr;
+//     Pyet_syscall(G_CVAR_UPDATE, cvar);
+//     return cvar->string;
+// }
+
+
+///Tools///
+std::string EtTools::et_Info_ValueForKey( const char *s, const char *key ){
+    std::string str(Info_ValueForKey(s, key));
+    return str;
 }
 
-char const* EtCaller::et_Cvar_Update(uintptr_t addr){
-    vmCvar_t* cvar = (vmCvar_t*)addr;
-    Pyet_syscall(G_CVAR_UPDATE, cvar);
-    return cvar->string;
+std::string EtTools::et_Info_RemoveKey( char *s, const char *key ){
+    Info_RemoveKey(s, key);
+    std::string str(s);
+    return str;
+}
+
+std::string EtTools::et_Info_SetValueForKey( char *s, const char *key, const char *value){
+    Info_SetValueForKey(s, key, value);
+    std::string str(s);
+    return str;
 }
 ///*****///
+
 
 using namespace boost::python;
 BOOST_PYTHON_MODULE(pyet)
@@ -170,4 +193,9 @@ BOOST_PYTHON_MODULE(pyet)
         .def("argv", &EtCaller::et_argv);
         //.def("RegisterCvar", &EtCaller::et_Cvar_Register)
         //.def("UpdateCvar", &EtCaller::et_Cvar_Update);
+
+    class_<EtTools>("EtTools")
+        .def("GetValueForKey", &EtTools::et_Info_ValueForKey)
+        .def("RemoveKey", &EtTools::et_Info_RemoveKey)
+        .def("SetValueForKey", &EtTools::et_Info_SetValueForKey);
 }

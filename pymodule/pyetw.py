@@ -13,22 +13,20 @@ def PyetPrint(text):
 **********
 """%text ) 
 
+
+
 class RunTime:
     loaded_addons=dict()
 runtime = RunTime()
 
 class Addon(object):
-    oninit=1
     name="Main"
     group="pyetw"
     
     def __init__(self):
         self.call = pyet.EtCaller()
-        if self.oninit:
-            runtime.loaded_addons[self.name] = self
-
-    def __del__(self):
-        del runtime.loaded_addons[self.name]
+        self.tools = pyet.EtTools()
+        runtime.loaded_addons[self.name] = self
 
     def GameConsoleCommand(self):
         pass
@@ -75,6 +73,8 @@ def Wrapper(*args):
     if cmd == GAME_INIT:
         f = "GameInit"
         tpl= args[0:3]
+        runtime.init = 0
+
     elif cmd == GAME_SHUTDOWN:
         f = "GameShutdown"
         tpl = ()

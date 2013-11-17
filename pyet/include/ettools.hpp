@@ -7,6 +7,12 @@
 __attribute__((format(printf,1,2)))
 char * va(char *format, ...);
 
+
+char *Info_ValueForKey( const char *s, const char *key );
+void Info_RemoveKey( char *s, const char *key );
+void Info_SetValueForKey( char *s, const char *key, const char *value );
+
+
 typedef struct {
 	int	        handle;
 	int			modificationCount;

@@ -3,7 +3,7 @@ Pyet2
 
 Python scripting API for Wolfenstein:Enemy Territory 
 
-    os : linux 
+    os : linux x86
     requirements : python 2.7
 
 

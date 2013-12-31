@@ -3,8 +3,10 @@ Pyet2
 
 Python scripting API for Wolfenstein:Enemy Territory 
 
-    os : linux x86
-    requirements : python 2.7
+    os : linux x86 ( PyET will only work on a 32bits system, if you are in a 64bits system, use a virtualmachine or
+                    a 32-bits chroot)
+                    
+    Requirements : python 2.7 , boost-python
 
 
 Installation

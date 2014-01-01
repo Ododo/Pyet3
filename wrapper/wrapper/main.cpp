@@ -60,5 +60,5 @@ void dllConstructor (void)
     std::string mod_path(path + "mod.so");
 
     mod_lib = dlopen( mod_path.c_str(), RTLD_NOW);
-    pyet_lib = dlopen( pyet_path.c_str(), RTLD_NOW);
+    pyet_lib = dlopen( pyet_path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 }

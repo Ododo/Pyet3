@@ -7,7 +7,6 @@
 
 using namespace boost;
 
-
 python::object pyet;
 
 extern "C"{
@@ -26,8 +25,12 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
     try{
 
     if(command == 0){
+        EtCaller caller;
+        std::string game_mod = caller.et_Cvar_Get("fs_game");
+        std::string str = "sys.path.append(\'./" + game_mod +  "\')";
         Py_Initialize();
-        PyRun_SimpleString("import sys; sys.path.append('./pyet/');"); // import DLFCN; sys.setdlopenflags(DLFCN.RTLD_NOW | DLFCN.RTLD_GLOBAL););
+        PyRun_SimpleString("import sys"); 
+        PyRun_SimpleString(str.c_str());
         pyet = python::import("pyetw");
     }
 

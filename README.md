@@ -1,10 +1,12 @@
 Pyet2
 =====
+r0.0.2
 
 Python scripting API for Wolfenstein:Enemy Territory 
 
-    os : linux x86 ( PyET will only work on a 32bits system, if you are in a 64bits system, use a virtualmachine or
-                    a 32-bits chroot)
+    os : linux x86 
+    ( PyET will only work on a 32bits system, if you are in a 64bits system, use a virtualmachine or
+    a 32-bits chroot)
                     
     Requirements : python 2.7 , boost-python
 
@@ -28,7 +30,15 @@ How To
     -In this file, create a class inherited from pyetw.Addon.
        see addons/example.py
     -add 'import my_first_addon' to addons/__init__.py
-       
+
+
+
+Troubleshooting
+================
+
+    Pyet is at a very unstable state, if you encounter segfaults check if pyet has access to ET files.
+    You are free to ask questions on IRC (#pyet, @quakenet), open issues on github, or contact me 
+    by mail (check my github profile).
        
 Communicate with pyet through the Console
 ========

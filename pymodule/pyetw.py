@@ -2,6 +2,7 @@ import traceback
 
 import pyet
 from etConstants import *
+from collections import defaultdict
 
 def PyetPrint(text):
     print (
@@ -16,7 +17,7 @@ def PyetPrint(text):
 
 
 class RunTime:
-    loaded_addons=dict()
+    loaded_addons = defaultdict(dict)
 runtime = RunTime()
 
 class Addon(object):
@@ -26,7 +27,10 @@ class Addon(object):
     def __init__(self):
         self.call = pyet.EtCaller()
         self.tools = pyet.EtTools()
-        runtime.loaded_addons[self.name] = self
+        runtime.loaded_addons[self.group][self.name] = self
+
+    def unload(self):
+        pass
 
     def GameConsoleCommand(self):
         pass
@@ -70,6 +74,7 @@ def Wrapper(*args):
     Et Callbacks
     """
     cmd = args[0]
+    f = ""
     if cmd == GAME_INIT:
         f = "GameInit"
         tpl= args[0:3]
@@ -83,28 +88,30 @@ def Wrapper(*args):
         tpl = args[0:3]
     elif cmd == GAME_CLIENT_BEGIN:
         f = "ClientBegin"
-        tpl = args[0],
+        tpl = args[1],
     elif cmd == GAME_CLIENT_USERINFO_CHANGED:
        f = "ClientUserInfoChanged"
-       tpl = args[0],
+       tpl = args[1],
     elif cmd == GAME_CLIENT_DISCONNECT:
         f = "ClientDisconnect"
-        tpl = args[0],
+        tpl = args[1],
     elif cmd == GAME_CLIENT_COMMAND:
         f = "ClientCommand"
-        tpl = args[0],
+        tpl = args[1],
     elif cmd == GAME_CLIENT_THINK:
         f = "ClientThink"
-        tpl = args[0],
+        tpl = args[1],
     elif cmd == GAME_RUN_FRAME:
         f = "GameRunFrame"
-        tpl = args[0],
+        tpl = args[1],
     elif cmd == GAME_CONSOLE_COMMAND:
         f = "GameConsoleCommand"
         tpl = ()
 
-    for a in runtime.loaded_addons.values():
-        getattr(a, f)(*tpl)
+    if f:
+        for g in runtime.loaded_addons.values():
+            for a in g.values():
+                getattr(a, f)(*tpl)
 
 #################
 

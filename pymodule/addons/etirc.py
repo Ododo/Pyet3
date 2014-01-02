@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+#Note : irc module is needed ( apt-get install python-pip ; pip install irc )
 
 ####CONFIG##############
 SERVER="irc.quakenet.org"

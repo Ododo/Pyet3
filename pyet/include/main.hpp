@@ -25,9 +25,9 @@ class EtCaller
 class EtTools
 {
     public:
-    std::string et_Info_ValueForKey( const char *s, const char *key );
-    std::string et_Info_RemoveKey( char *s, const char *key );
-    std::string et_Info_SetValueForKey( char *s, const char *key, const char *value);
+    std::string et_Info_ValueForKey( char const *s, const char *key );
+    std::string et_Info_RemoveKey( char const *s, const char *key );
+    std::string et_Info_SetValueForKey( char const *s, const char *key, const char *value);
 };
 
 

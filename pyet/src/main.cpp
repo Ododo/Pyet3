@@ -162,15 +162,19 @@ std::string EtTools::et_Info_ValueForKey( const char *s, const char *key ){
     return str;
 }
 
-std::string EtTools::et_Info_RemoveKey( char *s, const char *key ){
-    Info_RemoveKey(s, key);
-    std::string str(s);
+std::string EtTools::et_Info_RemoveKey(char const *s, const char *key ){
+    char s_[1024];
+    strcpy(s_,s);
+    Info_RemoveKey(s_, key);
+    std::string str(s_);
     return str;
 }
 
-std::string EtTools::et_Info_SetValueForKey( char *s, const char *key, const char *value){
-    Info_SetValueForKey(s, key, value);
-    std::string str(s);
+std::string EtTools::et_Info_SetValueForKey(char const *s, const char *key, const char *value){
+    char s_[1024];
+    strcpy(s_, s);
+    Info_SetValueForKey(s_, key, value);
+    std::string str(s_);
     return str;
 }
 ///*****///

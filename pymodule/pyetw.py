@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
+
 import traceback
 
 import pyet
 from etConstants import *
 from collections import defaultdict
+
+CALLER = pyet.EtCaller()
+TOOLS = pyet.EtTools()
 
 def PyetPrint(text):
     print (
@@ -15,7 +20,6 @@ def PyetPrint(text):
 """%text ) 
 
 
-
 class RunTime:
     loaded_addons = defaultdict(dict)
 runtime = RunTime()
@@ -25,8 +29,8 @@ class Addon(object):
     group="pyetw"
     
     def __init__(self):
-        self.call = pyet.EtCaller()
-        self.tools = pyet.EtTools()
+        self.call = CALLER
+        self.tools = TOOLS
         runtime.loaded_addons[self.group][self.name] = self
 
     def unload(self):
@@ -61,7 +65,66 @@ class Addon(object):
 
     def GameRunFrame(self, leveltime):
         pass
-    
+
+
+class Client(object):
+    """
+    The Client class give an easy access to player attribute.
+    and provide useful methods to interact with the client.
+    To use it , import it from an addon with 'from pyetw import Client' 
+    and instanciate it 'inst = Client()'.
+
+    After that you have a nice access to client data:
+        cl = inst.get_client(client)
+        print cl["name"]           // access UserInfo
+        cl["name"] = "changedname" // update UserInfo
+        cl.kick("msg", 1000)       // kick player
+    """
+
+    def get_client(self, client_num):
+        return self._client(client_num)
+
+    class _client(dict):
+        #available keys
+  	keys = ["cg_etVersion", "cg_uinfo", "g_password",
+                "cl_guid", "cl_anonymous","snaps", "rate", 
+                "name", "cl_wwwDownload", "cl_punkbuster", 
+                "ip"]
+
+        def __init__(self, client_num):
+            self.client_num = client_num
+            self.call = CALLER
+            self.tools = TOOLS
+        
+        def __getitem__(self, key):
+            if key not in self.keys: 
+               self.msg_error(key)
+               return
+            userinfo = self.call.GetUserInfo(int(self.client_num))
+            return self.tools.GetValueForKey(userinfo, str(key))
+
+        def __setitem__(self, key, value):
+            if key not in self.keys: 
+                self.msg_error(key)
+                return
+            userinfo = self.call.GetUserInfo(self.client_num)
+            userinfo = self.setvalueforkey(userinfo, key, value)
+            self.call.SetUserInfo(self.client_num, userinfo)
+           
+        def kick(self, reason, length):
+            self.call.DropCLient(self.client_num, str(reason), int(length))
+
+        def msg_error(self, key):
+           PyetPrint("UserInfo Key %s doest not exist \
+                    ; available keys are %s" % (key, repr(self.keys)) )
+
+        def setvalueforkey(self, userinfo, key, value):
+           """
+           fix for self.tools.SetValueForkey
+           """
+           info = self.tools.RemoveKey(userinfo, key)
+           return info + "\%s\%s" %(key,value)
+
 try:
     import addons
 except (ImportError, SyntaxError):
@@ -85,7 +148,7 @@ def Wrapper(*args):
         tpl = ()
     elif cmd == GAME_CLIENT_CONNECT:
         f = "ClientConnect"
-        tpl = args[0:3]
+        tpl = args[1:4]
     elif cmd == GAME_CLIENT_BEGIN:
         f = "ClientBegin"
         tpl = args[1],
@@ -114,6 +177,8 @@ def Wrapper(*args):
                 getattr(a, f)(*tpl)
 
 #################
+
+
 
 
 

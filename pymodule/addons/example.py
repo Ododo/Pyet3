@@ -34,4 +34,33 @@ class ExampleAddon(Addon):
 
 inst = ExampleAddon()#required for each addon, name of instance does not matter.
 
+from pyetw import Client
+
+class Example2(Addon):
+
+    """
+    How to use the pywet.Client class
+    """
+    group="example"
+    name = "Example2"
+
+    client_manager = Client()
+
+    def ClientUserInfoChanged(self, client):
+        """
+        This function reverse the player name
+        """
+        cl = self.client_manager.get_client(client)
+        
+        actual_name = cl["name"]
+        new_name = actual_name[::-1] #reverse the string
+        cl["name"] = new_name #update userinfo
+
+        #short version : cl["name"] = cl_["name"][::-1]
+
+inst2 = Example2()	
+        
+        
+
+
 

@@ -2,41 +2,89 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <cstdarg>
+#include <cstdint>
 
 #include "../include/main.hpp"
 
+
 using namespace boost;
 
-python::object pyet;
+python::object pyet; //imported module object
+
+typedef void (*UVARIADIC) (...);
+typedef int  (*IVARIADIC)  (int...);
+typedef int  (*SYSCALL)( int arg, ... ) ;
+
+World* world = new World; //Collect informations from the game on runtime
+
+static SYSCALL engine_syscall =  (SYSCALL)-1;
+
+int wrapper_syscall (int arg, ...){
+   //wrap calls from the mod
+   void *arguments = __builtin_apply_args();
+   void *result = __builtin_apply((UVARIADIC) engine_syscall, arguments, 16*sizeof(intptr_t));
+
+   va_list  ap;
+   va_start(ap, arg);
+
+   if (arg == G_LOCATE_GAME_DATA){
+       world->entities = va_arg(ap, gentity_t *);
+   }
+
+   //if (arg == G_LINKENTITY){
+   //    gentity_t *gent =  va_arg(ap,  gentity_t *);
+   //    if (gent->r.linkcount == 1){
+        // if it is a new entity , set/replace our null/old entity ptr
+    //      world->entities[gent->s.number] = gent;
+   //    }
+   //}
+   va_end(ap);
+   __builtin_return(result); // return what the engine wants to return
+}
 
 extern "C"{
 
-static int (*Pyet_syscall)( int arg, ... ) = (int (*)( int, ...))-1;
-
 __attribute__((visibility("default")))
-void dllEntry( int (*syscallptr)( int arg,... ) ) {
-    Pyet_syscall = syscallptr;
-    ///our syscall
+SYSCALL dllEntry( SYSCALL syscallptr)  {
+     //Get engine syscall and return our fake syscall
+     engine_syscall = syscallptr;
+     return wrapper_syscall;
 }
+
 
 __attribute__((visibility("default")))
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 
     try{
 
-    if(command == 0){
+    switch (command){
+
+    case GAME_INIT:
+    {
+
         EtCaller caller;
         std::string game_mod = caller.et_Cvar_Get("fs_game");
         std::string str = "sys.path.append(\'./" + game_mod +  "\')";
+
         Py_Initialize();
-        PyRun_SimpleString("import sys"); 
+        PyRun_SimpleString("import sys");
         PyRun_SimpleString(str.c_str());
         pyet = python::import("pyetw");
+        break;
+    }
+
+    case GAME_RUN_FRAME:
+    {
+        world->leveltime = arg0; //update leveltime
+        break;
+    }
+
     }
 
     python::object wrapper = pyet.attr("Wrapper")(command,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
 
     }
+
     catch(...)
         {
                 PyErr_Print();
@@ -45,7 +93,8 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
     return -1;
 }
 
-}
+
+} //END EXTERN C
 
 
 template<class T>
@@ -61,47 +110,47 @@ void PYETPRINT(T str){
 
 ///METHODS///
 int EtCaller::et_gPrint(char const* msg) {
-    Pyet_syscall( G_PRINT, msg );
+    engine_syscall( G_PRINT, msg );
     return 1;
 }
 
 int EtCaller::et_gError(char const* msg){
-    Pyet_syscall( G_ERROR, msg);
+    engine_syscall( G_ERROR, msg);
     return 1;
 }
 
 std::string EtCaller::et_Cvar_Get(char const* cvar){
     char buff[256];
-    Pyet_syscall(G_CVAR_VARIABLE_STRING_BUFFER, cvar, buff, sizeof(buff));
+    engine_syscall(G_CVAR_VARIABLE_STRING_BUFFER, cvar, buff, sizeof(buff));
     std::string str(buff);
     return str;
 }
 
 int EtCaller::et_Cvar_Set(char const* cvar, char const* value){
-    Pyet_syscall( G_CVAR_SET, cvar, value );
+    engine_syscall( G_CVAR_SET, cvar, value );
     return 1;
 }
 
 std::string EtCaller::et_getConfigString(int i){
     char buff[256];
     ///UNSAFE
-    Pyet_syscall( G_GET_CONFIGSTRING, i, buff, sizeof(buff));
+    engine_syscall( G_GET_CONFIGSTRING, i, buff, sizeof(buff));
     std::string str(buff);
     return str;
 }
 
 int EtCaller::et_setConfigString(int i, char const* cvs){
-    Pyet_syscall( G_SET_CONFIGSTRING, i, cvs);
+    engine_syscall( G_SET_CONFIGSTRING, i, cvs);
     return 1;
 }
 
 int EtCaller::et_SendMsg(int client, char const* msg){
-    Pyet_syscall( G_SENDMESSAGE, client, msg, sizeof(msg));
+    engine_syscall( G_SENDMESSAGE, client, msg, sizeof(msg));
     return 1;
 }
 
 int EtCaller::et_ConsoleCmd(int delay, char const* cmd){
-	Pyet_syscall( G_SEND_CONSOLE_COMMAND, delay, va("%s\n", cmd) );
+	engine_syscall( G_SEND_CONSOLE_COMMAND, delay, va("%s\n", cmd) );
 	return 1;
 }
 
@@ -110,34 +159,34 @@ int EtCaller::et_ServerCmd(int client, char const* cmd){
 		PYETPRINT("et_ServerCmd( ... ) length exceeds 1022.\n");
 		return 0;
 	}
-	Pyet_syscall( G_SEND_SERVER_COMMAND, client, cmd );
+	engine_syscall( G_SEND_SERVER_COMMAND, client, cmd );
 	return 1;
 }
 
 int EtCaller::et_DropCLient(int client, char const* reason, int length) {
-    Pyet_syscall( G_DROP_CLIENT, client, reason, length );
+    engine_syscall( G_DROP_CLIENT, client, reason, length );
     return 1;
 }
 
 std::string EtCaller::et_GetUserInfo(int client) {
     char userinfo[1024];
-    Pyet_syscall( G_GET_USERINFO, client, userinfo, sizeof(userinfo));
+    engine_syscall( G_GET_USERINFO, client, userinfo, sizeof(userinfo));
     std::string str(userinfo);
     return str;
 }
 
 int EtCaller::et_SetUserInfo(int client, char const* userinfo){
-    Pyet_syscall( G_SET_USERINFO, client, userinfo);
+    engine_syscall( G_SET_USERINFO, client, userinfo);
     return 1;
 }
 
 int EtCaller::et_argc(){
-    return Pyet_syscall( G_ARGC );
+    return engine_syscall( G_ARGC );
 }
 
 std::string EtCaller::et_argv(int i){
     char buff[1024];
-    Pyet_syscall( G_ARGV, i, buff, sizeof(buff));
+    engine_syscall( G_ARGV, i, buff, sizeof(buff));
     std::string str(buff);
     return str;
 }
@@ -145,13 +194,13 @@ std::string EtCaller::et_argv(int i){
 //uintptr_t EtCaller::et_Cvar_Register(char const* name, char const* value, int flags){
 
 //    vmCvar_t *cvar;
-//    Pyet_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
+//    engine_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
 //    return (uintptr_t)&cvar;
 // }
 
 // char const* EtCaller::et_Cvar_Update(uintptr_t addr){
 //     vmCvar_t* cvar = (vmCvar_t*)addr;
-//     Pyet_syscall(G_CVAR_UPDATE, cvar);
+//     engine_syscall(G_CVAR_UPDATE, cvar);
 //     return cvar->string;
 // }
 
@@ -176,6 +225,201 @@ std::string EtTools::et_Info_SetValueForKey(char const *s, const char *key, cons
     Info_SetValueForKey(s_, key, value);
     std::string str(s_);
     return str;
+}
+///*****///
+
+///ENTITIES ///
+///World::* methods are rewrited ET functions, adapted for pyet.
+
+gentity_t * World::GetFreeEntity(int &num){
+    //Search a unused entity in our array
+    int i;
+    gentity_t * gent;
+
+    for(i=0 ; i<1023 ; i++){
+        gent = this->entities + i;
+
+        if(!gent){
+            continue;
+        }
+
+        if (!gent->inuse){
+            num = i; //ent->s.number is always 0 at this point but we know that the entity's num was i .
+
+        engine_syscall(G_UNLINKENTITY, gent);
+       // this->InitEntity(gent);
+        return gent;
+        }
+    }
+    return 0;
+}
+
+
+Entity* SpawnTempEntity(python::list tab, int event){
+    //G_tempentity + G_SetOrigin in one function
+    int num;
+    vec3_t origin;
+    gentity_t *e = world->GetFreeEntity(num);
+    if (!e){
+        return 0;
+    }
+    e->s.number = num;
+    for(int i = 0; i<3 ; i++){
+        origin[i] = python::extract<float>(tab[i]);
+    }
+
+    vec3_t snapped;
+
+    e->s.eType = static_cast<entityType_t> (ET_EVENTS + event); //  c++ trick
+
+    e->classname = "tempEntity";
+    e->eventTime = world->leveltime; //level.time to world->leveltime
+    e->r.eventTime =  world->leveltime;
+    e->freeAfterEvent = qtrue;
+
+    VectorCopy(origin, snapped);
+    SnapVector(snapped);
+
+    VectorCopy(snapped, e->s.pos.trBase);
+    e->s.pos.trType = TR_STATIONARY;
+    e->s.pos.trTime = 0;
+    e->s.pos.trDuration = 0;
+    VectorClear(e->s.pos.trDelta);
+
+    VectorCopy(snapped, e->s.origin);
+    VectorCopy(snapped, e->r.currentOrigin);
+
+    if (e->client)
+    {
+        VectorCopy(snapped, e->client->ps.origin);
+    }
+
+    engine_syscall(G_LINKENTITY, e);
+
+    return new Entity(e->s.number);
+    //return e;
+}
+
+Entity* GetFreeEntity(){
+    //Return a new Entity class if an entity is free
+    int num;
+    gentity_t *ent = world->GetFreeEntity(num);
+    if (!ent){
+        return 0;
+    }
+
+    return new Entity(num);
+}
+
+void InitEntity(int num){
+    //
+    gentity_t * gent = world->entities + num;
+
+    if (gent){
+
+    gent->inuse = qtrue;
+    gent->classname = "noclass";
+    gent->s.number = gent - world->entities;
+    gent->r.ownerNum = 1022;
+    gent->nextthink = 0;
+    gent->free = NULL;
+    gent->scriptStatus.scriptEventIndex = -1;
+    gent->spawnTime = world->leveltime; //level.time;
+    }
+}
+
+///
+
+///Python Entity class
+Entity::Entity(int index){
+    this->index = index;
+}
+
+gentity_t* Entity::getentity(){
+    return world->entities + this->index;
+}
+
+void Entity::link(){
+    engine_syscall(G_LINKENTITY, this->getentity());
+}
+void Entity::unlink(){
+    engine_syscall(G_UNLINKENTITY, this->getentity());
+}
+
+void Entity::Free(){
+    gentity_t *en = this->getentity();
+    if (en->free){
+        en->free(en);
+    }
+    this->unlink();
+}
+
+void Entity::reached(){
+    gentity_t *en = this->getentity();
+    if (en->reached){
+        en->reached(en);
+    }
+}
+
+void Entity::blocked(int num){
+    gentity_t *en = this->getentity();
+    gentity_t *other = world->entities + num;
+    if (en->blocked){
+        en->blocked(en, other);
+    }
+}
+
+void Entity::use(int num, int a){
+    gentity_t *en = this->getentity();
+    gentity_t *other = world->entities + num;
+    gentity_t *activator = world->entities + a;
+    if (en->use){
+        en->use(en, other, activator);
+    }
+}
+
+ void Entity::pain(int num, int damage, python::list point){
+    gentity_t *en = this->getentity();
+    gentity_t *attacker = world->entities + num;
+    vec3_t array;
+    ListToArray(3, array, point);
+    if (en->pain){
+        en->pain(en, attacker, damage, array);
+    }
+}
+
+void Entity::die(int num, int a, int damage, int mod){
+    gentity_t *en = this->getentity();
+    gentity_t *inflictor = world->entities + num;
+    gentity_t *attacker = world->entities + a;
+    if(en->die){
+        en->die(en, inflictor, attacker, damage, mod);
+    }
+
+}
+
+python::object Entity::GetField(std::string field){
+
+    return GetValueForString(world->entities, this->getentity(), field);
+}
+
+int Entity::SetField(std::string field, python::object value, int relink){
+    gentity_t * ent;
+    int result;
+
+    ent = this->getentity();
+
+    if(ent->r.linked){
+        engine_syscall(G_UNLINKENTITY, ent);
+    }
+
+    result = SetValueForString(this->getentity(), field, value);
+
+    if( result && relink){
+        engine_syscall(G_LINKENTITY, ent);
+    }
+
+    return result;
 }
 ///*****///
 
@@ -205,4 +449,24 @@ BOOST_PYTHON_MODULE(pyet)
         .def("GetValueForKey", &EtTools::et_Info_ValueForKey)
         .def("RemoveKey", &EtTools::et_Info_RemoveKey)
         .def("SetValueForKey", &EtTools::et_Info_SetValueForKey);
+
+    //Python interface for world
+    class_<Entity>("World", init<int>())
+        .def_readonly("index", &Entity::index)
+        .def("GetField", &Entity::GetField)
+        .def("SetField", &Entity::SetField)
+        .def("Link", &Entity::link)
+        .def("Unlink", &Entity::unlink)
+        .def("free", &Entity::Free)
+        .def("die", &Entity::die)
+        .def("reached", &Entity::reached)
+        .def("pain", &Entity::pain)
+        .def("use", &Entity::use)
+        .def("blocked", &Entity::blocked)
+        .def("GetFreeEntity", &GetFreeEntity, return_value_policy<manage_new_object>())
+            .staticmethod("GetFreeEntity")
+        .def("TempEntity", &SpawnTempEntity, return_value_policy<manage_new_object>())
+            .staticmethod("TempEntity")
+        .def("InitEntity", &InitEntity).staticmethod("InitEntity")
+        ;
 }

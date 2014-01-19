@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../prog/et/pyet/pyet" prefix_auto="1" extension_auto="1" />
+				<Option output="../build/pyet" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -36,16 +36,25 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
-			<Add option="-I/usr/include/python2.7" />
+			<Add option="-I/home/olivier/chroot32b/usr/include/python2.7" />
+			<Add option="-L/home/olivier/chroot32b/usr/lib/" />
 			<Add option="-std=c++11" />
+			<Add option="-m32" />
+			<Add option="-DPYTHON_INCLUDE_DIR=/home/olivier/chroot32b/usr/include/python2.7" />
+			<Add option="-DPYTHON_LIBRARY=/home/olivier/chroot32b/usr/lib/libpython2.7.so" />
 		</Compiler>
 		<Linker>
+			<Add option="-m32" />
+			<Add option="-L/home/olivier/chroot32b/usr/lib/" />
 			<Add option="-lpython2.7" />
 			<Add option="-lboost_python" />
 		</Linker>
+		<Unit filename="../common/include/etdef.hpp" />
 		<Unit filename="include/ettools.hpp" />
+		<Unit filename="include/gent_parser.hpp" />
 		<Unit filename="include/main.hpp" />
 		<Unit filename="src/ettools.cpp" />
+		<Unit filename="src/gent_parser.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

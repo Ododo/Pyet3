@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../common/include/etdef.hpp" open="1" top="0" tabpos="6">
+		<Cursor position="43920" topLine="1287" />
+	</File>
+	<File name="include/ettools.hpp" open="1" top="0" tabpos="5">
+		<Cursor position="28" topLine="0" />
+	</File>
+	<File name="include/gent_parser.hpp" open="1" top="0" tabpos="3">
+		<Cursor position="1269" topLine="1" />
+	</File>
+	<File name="include/main.hpp" open="1" top="0" tabpos="2">
+		<Cursor position="18" topLine="0" />
+	</File>
+	<File name="src/ettools.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2340" topLine="0" />
+	</File>
+	<File name="src/gent_parser.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="12766" topLine="287" />
+	</File>
+	<File name="src/main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1286" topLine="401" />
+	</File>
+</CodeBlocks_layout_file>

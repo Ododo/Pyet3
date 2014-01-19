@@ -1,5 +1,8 @@
 #include <string>
+
 #include "../include/ettools.hpp"
+#include "../include/gent_parser.hpp"
+
 
 class EtCaller
 {
@@ -31,3 +34,32 @@ class EtTools
 };
 
 
+class Entity
+{
+    public:
+    int set = 0;
+    int index;
+
+    Entity(int index);
+    boost::python::object GetField(std::string);
+    int SetField(std::string, boost::python::object, int);
+    void Free();
+    void link();
+    void unlink();
+    void reached();
+    void blocked(int num);
+    void use(int num, int a);
+    void pain(int num, int damage, python::list point);
+    void die(int num, int a, int damage, int mod);
+
+    private:
+    gentity_t * getentity();
+};
+
+//Runtime game informations.
+class World{
+    public:
+    int leveltime;
+    gentity_t *entities;
+    gentity_t * GetFreeEntity(int&);
+};

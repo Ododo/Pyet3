@@ -1,0 +1,3 @@
+MAIN {
+    local: __builtin_avcall; 
+};

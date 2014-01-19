@@ -1,42 +1,53 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <sstream>
+#include <cstdarg>
+#include <cstdint>
+
+
+typedef int  (*SYSCALL)( int arg, ... ) ;
+typedef void (*UVARIADIC) (...);
+typedef int  (*IVARIADIC)  (int...);
+
+IVARIADIC mod_entryPoint;
+IVARIADIC pyet_entryPoint;
 
 extern "C"{
+
+static SYSCALL engine_syscall =  (SYSCALL)-1;
 
 void *mod_lib;
 void *pyet_lib;
 
 
 __attribute__((visibility("default")))
-void dllEntry( int (*syscallptr)( int arg,... ) ) {
+void dllEntry( SYSCALL  syscallptr) {
+    engine_syscall = syscallptr;
+    void  (*mod_dllEntry)( SYSCALL );
+  //  void  (*pyet_dllEntry)( SYSCALL );
+    SYSCALL  (*pyet_dllEntry)( SYSCALL);
 
-    void  (*mod_dllEntry)( int (*m_syscallptr)(int, ...) );
-    void  (*pyet_dllEntry)( int (*m_syscallptr)(int, ...) );
-
-    mod_dllEntry = (void  (*)( int (*)(int, ...) ) ) dlsym( mod_lib, "dllEntry" );
-    pyet_dllEntry = (void  (*)( int (*)(int, ...) ) ) dlsym( pyet_lib, "dllEntry" );
+    mod_dllEntry = (void  (*)( SYSCALL ) ) dlsym( mod_lib, "dllEntry" );
+    pyet_dllEntry = (SYSCALL  (*)( SYSCALL) ) dlsym( pyet_lib, "dllEntry" );
 
     if (mod_dllEntry && pyet_dllEntry){
-        mod_dllEntry(syscallptr);
-        pyet_dllEntry(syscallptr);
+        SYSCALL wrapper = pyet_dllEntry(syscallptr);
+        mod_dllEntry(wrapper);
     }
     else{
         std::cout << "mod.so or pyet.so not found :" << std::endl;
-        std::cout << dlerror() << std::endl;
+        std::cout << "[Pyet]" << dlerror() << std::endl;
     }
 
 }
 
-int (*mod_entryPoint)(int, ...);
-int (*pyet_entryPoint)(int, ...);
 
 __attribute__((visibility("default")))
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 
     if(command == 0){
-        mod_entryPoint = (int (*)(int, ...))dlsym( mod_lib, "vmMain" );
-        pyet_entryPoint = (int (*)(int, ...))dlsym( pyet_lib, "vmMain" );
+        mod_entryPoint = (IVARIADIC) dlsym( mod_lib, "vmMain" );
+        pyet_entryPoint =(IVARIADIC) dlsym( pyet_lib, "vmMain" );
     }
 
     if(mod_entryPoint && pyet_entryPoint){

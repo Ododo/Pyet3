@@ -36,7 +36,7 @@ How To
 Troubleshooting
 ================
 
-    Pyet is at a very unstable state, if you encounter segfaults check if pyet has access to ET files.
+    Pyet is at a very unstable stade, if you encounter segfaults check if pyet has access to ET files.
     You are free to ask questions on IRC (#pyet, @quakenet), open issues on github, or contact me 
     by mail (check my github profile).
        
@@ -51,7 +51,7 @@ Communicate with pyet through the Console
   
 Doc
 ======
-(provisional documentation)
+SEE http://pywet.sourceforge.net/html/
 This api is very similar to LUA api, doc can easily be found on web.
 The plugin is still in development, this is the list of features available at the moment:
 

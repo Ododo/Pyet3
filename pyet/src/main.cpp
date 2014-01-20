@@ -427,46 +427,54 @@ int Entity::SetField(std::string field, python::object value, int relink){
 using namespace boost::python;
 BOOST_PYTHON_MODULE(pyet)
 {
+
     class_<EtCaller>("EtCaller")
-        .def("gPrint", &EtCaller::et_gPrint)
-        .def("gError", &EtCaller::et_gError)
+        .def("gPrint", &EtCaller::et_gPrint, "Print message to console")
+        .def("gError", &EtCaller::et_gError, "Raise an error, stop the game")
         .def("GetCvar", &EtCaller::et_Cvar_Get)
         .def("SetCvar", &EtCaller::et_Cvar_Set)
-        .def("GetConfigStr", &EtCaller::et_getConfigString)
-        .def("SetConfigStr", &EtCaller::et_setConfigString)
+        .def("GetConfigStr", &EtCaller::et_getConfigString, "Get Info String by num")
+        .def("SetConfigStr", &EtCaller::et_setConfigString, "Set Info String by num and value")
         .def("SendMsg", &EtCaller::et_SendMsg)
-        .def("ServerCmd", &EtCaller::et_ServerCmd)
-        .def("ConsoleCmd", &EtCaller::et_ConsoleCmd)
-        .def("DropClient", &EtCaller::et_DropCLient)
-        .def("GetUserInfo", &EtCaller::et_GetUserInfo)
-        .def("SetUserInfo", &EtCaller::et_SetUserInfo)
+        .def("ServerCmd", &EtCaller::et_ServerCmd, "Send command to server, (client,cmd)")
+        .def("ConsoleCmd", &EtCaller::et_ConsoleCmd, "Execute console command, (delay, cmd)")
+        .def("DropClient", &EtCaller::et_DropCLient, "Kick/Ban a client for x second, (client, reason, length)")
+        .def("GetUserInfo", &EtCaller::et_GetUserInfo, "Get Info string of client")
+        .def("SetUserInfo", &EtCaller::et_SetUserInfo, "Set Info string of client, (client, InfoString userinfo)")
         .def("argc", &EtCaller::et_argc)
         .def("argv", &EtCaller::et_argv);
         //.def("RegisterCvar", &EtCaller::et_Cvar_Register)
         //.def("UpdateCvar", &EtCaller::et_Cvar_Update);
 
     class_<EtTools>("EtTools")
-        .def("GetValueForKey", &EtTools::et_Info_ValueForKey)
-        .def("RemoveKey", &EtTools::et_Info_RemoveKey)
-        .def("SetValueForKey", &EtTools::et_Info_SetValueForKey);
+        .def("GetValueForKey", &EtTools::et_Info_ValueForKey, "Get Value for key in infostring")
+        .def("RemoveKey", &EtTools::et_Info_RemoveKey, "Remove a key in infostring")
+        .def("SetValueForKey", &EtTools::et_Info_SetValueForKey, "Set value by key in infostring (infostring, key, value)");
 
     //Python interface for world
-    class_<Entity>("World", init<int>())
-        .def_readonly("index", &Entity::index)
-        .def("GetField", &Entity::GetField)
-        .def("SetField", &Entity::SetField)
-        .def("Link", &Entity::link)
-        .def("Unlink", &Entity::unlink)
-        .def("free", &Entity::Free)
+    class_<Entity>("World", "Entity object must be initialized by passing the entity number to World ( ent = World(num) )", init<int>())
+        .def_readonly("index", &Entity::index, "returns the entity Num")
+        .def("GetField", &Entity::GetField, "Get field value for current entity, return type can be int,float,list or string")
+        .def("SetField", &Entity::SetField, "(field, value, relink) - Set field value for current entity, value can be str,int,float or list for array field (vec3_t ..) \
+                                            \n if last argument 'relink' is set to 1 that means you want the entity to be automatically relinked after being \
+                                            \n unlinked and modified. It is  similar to \n ent.SetField('x', x , 0) ; ent.Link() , but more faster.")
+
+        .def("Link", &Entity::link, "Link the current entity to world")
+        .def("Unlink", &Entity::unlink,"Unlink the current entity from world")
+        .def("free", &Entity::Free, "Free the current entity")
         .def("die", &Entity::die)
         .def("reached", &Entity::reached)
         .def("pain", &Entity::pain)
         .def("use", &Entity::use)
         .def("blocked", &Entity::blocked)
-        .def("GetFreeEntity", &GetFreeEntity, return_value_policy<manage_new_object>())
-            .staticmethod("GetFreeEntity")
+        .def("GetFreeEntity", &GetFreeEntity, return_value_policy<manage_new_object>(), "Get a free entity from world, if a free entity was found , World object is returned \
+                                                                                    \n otherwise 0 is returned")
+        .staticmethod("GetFreeEntity")
+
         .def("TempEntity", &SpawnTempEntity, return_value_policy<manage_new_object>())
-            .staticmethod("TempEntity")
-        .def("InitEntity", &InitEntity).staticmethod("InitEntity")
+        .staticmethod("TempEntity")
+
+        .def("InitEntity", &InitEntity, "Set default values to entity, this is useful after calling World.GetFreeEntity()")
+        .staticmethod("InitEntity")
         ;
 }

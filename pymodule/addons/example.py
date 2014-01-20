@@ -26,7 +26,7 @@ class ExampleAddon(Addon):
             if info:
                 print "\nFound ConfigString !! : \n" + info
                 if key:
-                    value = self.tools.GetValueForKey(info, key) #Useful tools like (Get,Set)ValueForKey can be found in self.tools .
+                    value = self.tools.GetValueForKey(info, key) #Useful tools like (Get,Set)ValueForKey can be found in self.tools
                     if value:
                         print "\nValue in configstring for key %s is :" %key
                         print value
@@ -62,16 +62,26 @@ class Example2(Addon):
 
         #short version : cl["name"] = cl_["name"][::-1]
 
-inst2 = Example2()	
+#inst2 = Example2()	
         
+from fields import *
 
 class Example3(Addon):
     """
     - How to use the pyetw.World class
     and how to manage entities in Pyet -
     A list of fields can be found in fields.py
-    """
 
+
+    ent = World.GetFreeEntity()
+    if ent:
+        World.InitEntity(ent)
+        ent.SetField("sess.muted", 1, 1)            //client only field (int)
+        ent.SetField("classname", "SuperPlayer", 1) //string
+        ent.SetField("health" , 100 , 1)            // int
+        ent.SetField("rotate", [42,42,42], 1)       //vec3_t
+
+    """
     group="example"
     name = "Example3"
         
@@ -81,15 +91,6 @@ class Example3(Addon):
         if ping > 100:
             self.call.DropCLient(client, "Too high ping !", 60)
 
-        ent.SetField("sess.muted", 1, 1)
-        ent.SetField("classname", "SuperPlayer", 1)
-        ent.SetField("health" , 100 , 1)
-        ent.SetField("rotate", [42,42,42], 1)
+#inst3 = Example3()
 
-        #The last parameter 1 means : "i want the entity to be automatically relinked after being unlinked"
-        #it is similar to ent.SetField("x",x,0) ; ent.Link()  but more faster
-    
-inst3 = Example3()
-
-
-
+   

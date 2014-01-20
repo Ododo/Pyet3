@@ -75,17 +75,25 @@ class Example3(Addon):
     group="example"
     name = "Example3"
         
+    client_manager = Client()
+
     def ClientThink(self, client):
+        cl = self.client_manager.get_client(client)
+
         ent = World(client)
+
+        if cl["name"] == "MuteMe":
+            ent.SetField("sess.muted", 1, 1)
+
         ping = ent.GetField("ps.ping")
         if ping > 100:
             self.call.DropCLient(client, "Too high ping !", 60)
 
-        ent.SetField("sess.muted", 1, 1)
-        ent.SetField("classname", "SuperPlayer", 1)
-        ent.SetField("health" , 100 , 1)
-        ent.SetField("rotate", [42,42,42], 1)
-
+    def GameInit(self, leveltime, randomSeed, restart):
+        free_ent = World.GetFreeEntity()
+        free_ent.SetField("classname", "random", 1)
+        free_ent.SetField("health" , 100 , 1)
+        free_ent.SetField("rotate", [42,42,42], 1)
         #The last parameter 1 means : "i want the entity to be automatically relinked after being unlinked"
         #it is similar to ent.SetField("x",x,0) ; ent.Link()  but more faster
     

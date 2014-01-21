@@ -69,16 +69,16 @@ class Addon(object):
 
 class Client(object):
     """
-    The Client class give an easy access to player attribute.
-    and provide useful methods to interact with the client.
-    To use it , import it from an addon with 'from pyetw import Client' 
-    and instanciate it 'inst = Client()'.
-
+    The Client class give an easy access to the player attributes.
+    and provides useful methods to interact with the client.
+    To use it , import it from an addon with 'from pyetw import Client'
+    and instanciate  'inst = Client()'.
+    
     After that you have a nice access to client data:
-        cl = inst.get_client(client)
-        print cl["name"]           // access UserInfo
-        cl["name"] = "changedname" // update UserInfo
-        cl.kick("msg", 1000)       // kick player
+    cl = inst.get_client(client)
+    print cl["name"] // access UserInfo
+    cl["name"] = "changedname" // update UserInfo
+    cl.kick("msg", 1000) // kick player
     """
 
     def get_client(self, client_num):

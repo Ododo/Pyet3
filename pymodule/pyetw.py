@@ -141,7 +141,6 @@ def Wrapper(*args):
     if cmd == GAME_INIT:
         f = "GameInit"
         tpl= args[0:3]
-        runtime.init = 0
 
     elif cmd == GAME_SHUTDOWN:
         f = "GameShutdown"

@@ -3,6 +3,7 @@ Pyet2
 r0.0.3
 
 FORUM ===> http://pywet.sourceforge.net/forum/
+
 DOC   ===> http://pywet.sourceforge.net/html/
 
 Python scripting API for Wolfenstein:Enemy Territory 
@@ -40,6 +41,7 @@ Troubleshooting
 ================
 
     Pyet is at a very unstable stade, if you encounter segfaults check if pyet has access to ET files.
+    Forum address : http://pywet.sourceforge.net/forum/
     You are free to ask questions on IRC (#pyet, @quakenet), open issues on github, or contact me 
     by mail (check my github profile).
        

@@ -1,6 +1,9 @@
 Pyet2
 =====
-r0.0.2
+r0.0.3
+
+FORUM ===> http://pywet.sourceforge.net/forum/
+DOC   ===> http://pywet.sourceforge.net/html/
 
 Python scripting API for Wolfenstein:Enemy Territory 
 

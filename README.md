@@ -58,7 +58,6 @@ Doc
 ======
 SEE http://pywet.sourceforge.net/html/
 This api is very similar to LUA api, doc can easily be found on web.
-The plugin is still in development, this is the list of features available at the moment:
 
     Events
         Events from server. (to implement)
@@ -76,34 +75,6 @@ The plugin is still in development, this is the list of features available at th
         ClientThink(client)
         GameRunFrame(leveltime)
         
-    EtCaller (pyetw.EtCaller)
-        Class that allow you to call ET on runtime.
-    =======
-    
-    pyetw.Addon.call.
-        gPrint(msg) //print str on console / str
-        gError(msg) // raise error with message /str
-        GetCvar(cvar) // get value of cvar /str
-        SetCvar(cvar,value) // set value to cvar /str,str
-        GetConfigStr(i) // get the value of the ConfigString with number i /int, returns configString
-        SetConfigStr(i, cvs) // set the value of ConfigString i to cvs /int,str(configString)
-        SendMsg(client, msg) //int,str 
-        ConsoleCmd(delay, cmd) //int,str
-        ServerCmd(client, cmd) //int,str
-        DropCLient(client, reason, length)  //int,str,int
-        GetUserInfo(client) //int, returns str (infostring)
-        SetUserInfo(client, userinfo) //int, str (infostring)
-        argc() // returns int, 
-        argv(i)// int , returns str
-        
-     EtTools(pyetw.EtTools)
-         class with useful tools from ET.
-     =======
-     
-     pyetw.Addon.tools.
-         GetValueForKey(infostring, key) //str,str returns str (infostring)
-         RemoveKey(infostring, key) //str,str returns str (infostring)
-         SetValueForKey(infostring, key, value) //str,str,str returns str (infostring)
          
          
     Constants from ET can be found in EtConstants.py    

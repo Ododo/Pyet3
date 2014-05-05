@@ -2,7 +2,6 @@ Pyet2
 =====
 r0.0.3
 
-FORUM ===> http://pywet.sourceforge.net/forum/
 
 DOC   ===> http://pywet.sourceforge.net/html/
 

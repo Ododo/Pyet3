@@ -21,20 +21,23 @@ void *pyet_lib;
 
 
 __attribute__((visibility("default")))
-void dllEntry( SYSCALL  syscallptr) {
-    engine_syscall = syscallptr;
+void dllEntry( SYSCALL  syscallptr) 
+{
     void  (*mod_dllEntry)( SYSCALL );
-  //  void  (*pyet_dllEntry)( SYSCALL );
     SYSCALL  (*pyet_dllEntry)( SYSCALL);
+    SYSCALL wrapper;
 
+    engine_syscall = syscallptr;
     mod_dllEntry = (void  (*)( SYSCALL ) ) dlsym( mod_lib, "dllEntry" );
-    pyet_dllEntry = (SYSCALL  (*)( SYSCALL) ) dlsym( pyet_lib, "dllEntry" );
+    pyet_dllEntry = (SYSCALL  (*)( SYSCALL ) ) dlsym( pyet_lib, "dllEntry" );
 
     if (mod_dllEntry && pyet_dllEntry){
-        SYSCALL wrapper = pyet_dllEntry(syscallptr);
+        wrapper = pyet_dllEntry(syscallptr);
         mod_dllEntry(wrapper);
     }
-    else{
+
+    else
+    {
         std::cout << "mod.so or pyet.so not found :" << std::endl;
         std::cout << "[Pyet]" << dlerror() << std::endl;
     }
@@ -43,7 +46,9 @@ void dllEntry( SYSCALL  syscallptr) {
 
 
 __attribute__((visibility("default")))
-int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) 
+
+{
 
     if(command == 0){
         mod_entryPoint = (IVARIADIC) dlsym( mod_lib, "vmMain" );

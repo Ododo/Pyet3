@@ -1,6 +1,8 @@
 ///***************************************************************
 /// Copyright (C) 1999-2000 Id Software, Inc.
 
+//Tool functions from ET to be used in Pyet
+
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>

@@ -56,7 +56,7 @@ class Entity
     gentity_t * getentity();
 };
 
-//Runtime game informations.
+//Runtime game data.
 class World{
     public:
     int leveltime;

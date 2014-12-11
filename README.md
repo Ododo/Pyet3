@@ -8,7 +8,7 @@ DOC   ===> http://pywet.sourceforge.net/html/
 Python scripting API for Wolfenstein:Enemy Territory 
 
     os : linux x86 
-    ( PyET will only work on a 32bits system, if you are in a 64bits system, use a virtualmachine or
+    ( PyET will only work on a 32bits system, if you are on a 64bits system, use a virtualmachine or
     a 32-bits chroot)
                     
     Requirements : python 2.7 , boost-python
@@ -59,7 +59,7 @@ SEE http://pywet.sourceforge.net/html/
 This api is very similar to LUA api, doc can easily be found on web.
 
     Events
-        Events from server. (to implement)
+        
     ======
     
     pyetw.Addon.

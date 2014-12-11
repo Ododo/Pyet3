@@ -1,4 +1,10 @@
+///***************************************************************
+/// Copyright (C) 1999-2000 Id Software, Inc.
+
+//game definitions are gathered here in order to be used by the wrapper
+
 #define MAX_GENTITIES   ( 1 << 10 )
+
 typedef enum {qfalse, qtrue}  qboolean;
 typedef float vec_t;
 typedef vec_t vec3_t[3];

@@ -9,6 +9,8 @@
 
 using namespace boost;
 
+//
+
 python::object pyet; //imported module object
 
 typedef void (*UVARIADIC) (...);
@@ -19,8 +21,10 @@ World* world = new World; //Collect informations from the game on runtime
 
 static SYSCALL engine_syscall =  (SYSCALL)-1;
 
+//
+
 int wrapper_syscall (int arg, ...){
-   //wrap calls from the mod
+   //Wrap calls from the mod
    void *arguments = __builtin_apply_args();
    void *result = __builtin_apply((UVARIADIC) engine_syscall, arguments, 16*sizeof(intptr_t));
 
@@ -38,6 +42,7 @@ int wrapper_syscall (int arg, ...){
     //      world->entities[gent->s.number] = gent;
    //    }
    //}
+
    va_end(ap);
    __builtin_return(result); // return what the engine wants to return
 }
@@ -45,7 +50,8 @@ int wrapper_syscall (int arg, ...){
 extern "C"{
 
 __attribute__((visibility("default")))
-SYSCALL dllEntry( SYSCALL syscallptr)  {
+SYSCALL dllEntry( SYSCALL syscallptr)
+{
      //Get engine syscall and return our fake syscall
      engine_syscall = syscallptr;
      return wrapper_syscall;
@@ -53,7 +59,9 @@ SYSCALL dllEntry( SYSCALL syscallptr)  {
 
 
 __attribute__((visibility("default")))
-int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) 
+
+{
 
     try{
 
@@ -82,6 +90,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
     }
 
     python::object wrapper = pyet.attr("Wrapper")(command,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
+    //Perfom call to pyetw.wrapper
 
     }
 
@@ -108,7 +117,8 @@ void PYETPRINT(T str){
 }
 
 
-///METHODS///
+/*/METHODS/*/
+
 int EtCaller::et_gPrint(char const* msg) {
     engine_syscall( G_PRINT, msg );
     return 1;
@@ -191,21 +201,8 @@ std::string EtCaller::et_argv(int i){
     return str;
 }
 
-//uintptr_t EtCaller::et_Cvar_Register(char const* name, char const* value, int flags){
+/*/Tools/*/
 
-//    vmCvar_t *cvar;
-//    engine_syscall(G_CVAR_REGISTER, &cvar, name, value, flags);
-//    return (uintptr_t)&cvar;
-// }
-
-// char const* EtCaller::et_Cvar_Update(uintptr_t addr){
-//     vmCvar_t* cvar = (vmCvar_t*)addr;
-//     engine_syscall(G_CVAR_UPDATE, cvar);
-//     return cvar->string;
-// }
-
-
-///Tools///
 std::string EtTools::et_Info_ValueForKey( const char *s, const char *key ){
     std::string str(Info_ValueForKey(s, key));
     return str;
@@ -228,8 +225,10 @@ std::string EtTools::et_Info_SetValueForKey(char const *s, const char *key, cons
 }
 ///*****///
 
-///ENTITIES ///
-///World::* methods are rewrited ET functions, adapted for pyet.
+
+/*/ENTITIES /*/
+
+//World::* methods are rewrited ET functions, adapted for pyet.
 
 gentity_t * World::GetFreeEntity(int &num){
     //Search a unused entity in our array
@@ -247,7 +246,8 @@ gentity_t * World::GetFreeEntity(int &num){
             num = i; //ent->s.number is always 0 at this point but we know that the entity's num was i .
 
         engine_syscall(G_UNLINKENTITY, gent);
-       // this->InitEntity(gent);
+        
+        // this->InitEntity(gent);
         return gent;
         }
     }
@@ -257,13 +257,17 @@ gentity_t * World::GetFreeEntity(int &num){
 
 Entity* SpawnTempEntity(python::list tab, int event){
     //G_tempentity + G_SetOrigin in one function
+
     int num;
     vec3_t origin;
     gentity_t *e = world->GetFreeEntity(num);
+
     if (!e){
         return 0;
     }
+
     e->s.number = num;
+
     for(int i = 0; i<3 ; i++){
         origin[i] = python::extract<float>(tab[i]);
     }
@@ -312,10 +316,10 @@ Entity* GetFreeEntity(){
 }
 
 void InitEntity(int num){
-    //
     gentity_t * gent = world->entities + num;
 
-    if (gent){
+    if (gent)
+    {
 
     gent->inuse = qtrue;
     gent->classname = "noclass";
@@ -325,6 +329,7 @@ void InitEntity(int num){
     gent->free = NULL;
     gent->scriptStatus.scriptEventIndex = -1;
     gent->spawnTime = world->leveltime; //level.time;
+
     }
 }
 
@@ -443,8 +448,6 @@ BOOST_PYTHON_MODULE(pyet)
         .def("SetUserInfo", &EtCaller::et_SetUserInfo, "Set Info string of client, (client, InfoString userinfo)")
         .def("argc", &EtCaller::et_argc)
         .def("argv", &EtCaller::et_argv);
-        //.def("RegisterCvar", &EtCaller::et_Cvar_Register)
-        //.def("UpdateCvar", &EtCaller::et_Cvar_Update);
 
     class_<EtTools>("EtTools")
         .def("GetValueForKey", &EtTools::et_Info_ValueForKey, "Get Value for key in infostring")

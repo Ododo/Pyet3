@@ -7,6 +7,7 @@
 
 
 #define GetAttrByOfs(type, ent, ofs) *(type *) (ent + ofs)
+
 #define ArrayToList(imax, array, list) for(int i=0 ; i<imax ; i++){ list.append((array)[i]);}
 
 #define ListToArray(imax, array, list)  for(int i=0 ; i<imax ; i++){ \

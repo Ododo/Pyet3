@@ -1,3 +1,0 @@
-MAIN {
-    global: __builtin_avcall; 
-};

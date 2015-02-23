@@ -53,7 +53,7 @@ class ClientListener(Listener):
         caller = pyet.EtCaller()
         ent = World(client)
         ping = ent.GetField("ps.ping")
-        if ping > 1:
+        if ping > 100:
             caller.DropClient(client, "Too high ping !", 15)
 
   

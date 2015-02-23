@@ -159,7 +159,7 @@ class Client:
         self.call.SetUserInfo(self.client_num, userinfo)
            
     def kick(self, reason, length):
-        self.call.DropCLient(self.client_num, str(reason), int(length))
+        self.call.DropClient(self.client_num, str(reason), int(length))
 
     def msg_error(self, key):
         print("UserInfo Key %s doest not exist \

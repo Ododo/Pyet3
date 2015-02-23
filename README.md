@@ -43,7 +43,10 @@ Communicate with pyet through the Console
 
     pyet_load or pl   [addon]
     pyet_unload or pu [addon]
+    pyet_reload or pr [addon]
     pyet_state or ps : list all the addons loaded.
+    In order to load your addons on game initialization you must add 'set pyet_autoload addon1,addon2,..'
+    to your autoexec.cfg
 
   
 Doc

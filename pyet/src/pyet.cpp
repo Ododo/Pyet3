@@ -228,7 +228,7 @@ gentity_t * World::GetFreeEntity(int &num){
     int i;
     gentity_t * gent;
 
-    for(i=0 ; i<1023 ; i++){
+    for(i = MAX_CLIENTS; i<1023 ; i++){
         gent = this->entities + i;
 
         if(!gent){

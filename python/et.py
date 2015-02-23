@@ -55,11 +55,12 @@ class Core(Listener):
     def __repr__(self):
         return "core listener"
 
-    def loadAddon(self, name):
+    def loadAddon(self, name, re=False):
          try:
              a = __import__("addons." + name)
              module = getattr(a, name)
-             reload(module) #in case of reloading
+             if re:
+                 reload(module) #in case of reloading
              runtime.addons[name] = module
              for attr in module.__dict__.values():
                  if inspect.isclass(attr) and attr is not Listener \
@@ -81,8 +82,10 @@ class Core(Listener):
 
     def GameInit(self, leveltime, randomSeed, restart):
         autoloads = pyet.EtCaller().GetCvar("pyet_autoload")
-        for addon in autoloads.split(','):
-             self.loadAddon(addon)
+        if not autoloads:
+            return
+        for name in autoloads.split(','):
+             self.loadAddon(name)
 
     def GameConsoleCommand(self):
         caller = pyet.EtCaller()
@@ -108,7 +111,7 @@ class Core(Listener):
            
         if cmd in ("pyet_reload", "pr"):
             self.unloadAddon(module)
-            self.loadAddon(module)
+            self.loadAddon(module, True)
 
 
 runtime.listeners.append(Core())

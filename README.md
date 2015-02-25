@@ -31,8 +31,8 @@ Get Started
         pyet.EtCaller: used to perform calls to the game api 
             e.g: a = pyet.EtCaller().argv(0)
             
-        pyet.EtTools: used to perform calls to some tools function provided by the game 
-            e.g: a = pyet.EtTools().GetValueForKey(nbr, key)
+        pyet.EtTools: used to perform calls to some tool functions provided by the game 
+            e.g: a = pyet.EtTools().GetValueForKey(configstring, key)
             
         pyet.World: The entity management class 
             e.g: entity = pyet.World(entitynum) ; a = entity.GetField(field)

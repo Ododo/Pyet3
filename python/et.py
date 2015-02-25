@@ -8,12 +8,18 @@ import addons
 
 from imp import reload
 from etConstants import pyet_events
+from etConstants import GAME_INIT
 
 
 class RunTime:
     listeners = list()
     addons = dict()
 runtime = RunTime()
+
+
+def listeners_repr():
+    return [repr(l) for l in runtime.listeners]
+
 
 class Listener:
         
@@ -60,12 +66,15 @@ class Core(Listener):
              a = __import__("addons." + name)
              module = getattr(a, name)
              if re:
-                 reload(module) #in case of reloading
+                 reload(module)
              runtime.addons[name] = module
              for attr in module.__dict__.values():
                  if inspect.isclass(attr) and attr is not Listener \
                                           and issubclass(attr, Listener):
-                     runtime.listeners.append(attr())
+                     l = attr()
+                     if repr(l) not in listeners_repr():
+                         runtime.listeners.append(l)
+
              print("\nAddon %s loaded" %name)
 
          except (ImportError, SyntaxError):
@@ -74,7 +83,6 @@ class Core(Listener):
          return module
 
     def unloadAddon(self, module):
-        #todo fix : allow a unique listener class to be used in multiple addons
         for l in list(runtime.listeners):
             if type(l) in runtime.addons[module].__dict__.values():
                 print("removing listener %s" % l)
@@ -115,12 +123,14 @@ class Core(Listener):
             self.unloadAddon(module)
             self.loadAddon(module, True)
 
-
 runtime.listeners.append(Core())
-
 def Wrapper(*args):
+    event = args[0]
+    if event == GAME_INIT and "core listener" not in listeners_repr():
+        runtime.listeners.append(Core())
+
     for listener in runtime.listeners:
-        func = getattr(listener, pyet_events[args[0]])
+        func = getattr(listener, pyet_events[event])
         func(* args[1:len(inspect.getargspec(func)[0])])
 
 
@@ -164,5 +174,12 @@ class Client:
        """
        info = self.tools.RemoveKey(userinfo, key)
        return info + "\%s\%s" %(key,value)
+
+
+
+
+
+
+
 
 

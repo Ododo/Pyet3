@@ -66,6 +66,7 @@ class Core(Listener):
                  if inspect.isclass(attr) and attr is not Listener \
                                           and issubclass(attr, Listener):
                      runtime.listeners.append(attr())
+             print("\nAddon %s loaded" %name)
 
          except (ImportError, SyntaxError):
              print(traceback.format_exc())
@@ -79,6 +80,7 @@ class Core(Listener):
                 print("removing listener %s" % l)
                 runtime.listeners.remove(l)
         del runtime.addons[module]
+        print("\nAddon unloaded")
 
     def GameInit(self, leveltime, randomSeed, restart):
         autoloads = pyet.EtCaller().GetCvar("pyet_autoload")
@@ -93,10 +95,10 @@ class Core(Listener):
         module = caller.argv(1)
 
         if cmd in ("pyet_status", "ps"):
-            print("\nactive addons:")
+            print("\nActive addons:")
             for a in runtime.addons:
                 print ("", a)
-            print("active listeners:")
+            print("\nActive listeners:")
             for a in runtime.listeners:
                 print("", a)
 
@@ -123,19 +125,7 @@ def Wrapper(*args):
 
 
 class Client:
-    """
-    The Client class give an easy access to the player attributes.
-    and provides useful methods to interact with the client.
-    To use it , import it from an addon with 'from pyetw import Client'
-    and instanciate  'inst = Client()'.
-    
-    After that you have a nice access to client data:
-    cl = inst.get_client(client)
-    print cl["name"] // access UserInfo
-    cl["name"] = "changedname" // update UserInfo
-    cl.kick("msg", 1000) // kick player
-    """
-    #available keys
+
     keys = ["cg_etVersion", "cg_uinfo", "g_password",
             "cl_guid", "cl_anonymous","snaps", "rate", 
             "name", "cl_wwwDownload", "cl_punkbuster", 
@@ -174,12 +164,5 @@ class Client:
        """
        info = self.tools.RemoveKey(userinfo, key)
        return info + "\%s\%s" %(key,value)
-
-
-
-
-
-
-
 
 

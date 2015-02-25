@@ -123,7 +123,7 @@ class Core(Listener):
             self.unloadAddon(module)
             self.loadAddon(module, True)
 
-runtime.listeners.append(Core())
+
 def Wrapper(*args):
     event = args[0]
     if event == GAME_INIT and "core listener" not in listeners_repr():
@@ -174,12 +174,5 @@ class Client:
        """
        info = self.tools.RemoveKey(userinfo, key)
        return info + "\%s\%s" %(key,value)
-
-
-
-
-
-
-
 
 

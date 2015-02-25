@@ -16,6 +16,11 @@ extern "C"{
 
 static SYSCALL engine_syscall =  (SYSCALL)-1;
 
+int library_loaded = 0;
+
+char pyet_path[2048];
+char mod_path[2048];
+
 void *mod_lib;
 void *pyet_lib;
 
@@ -28,9 +33,14 @@ void dllEntry( SYSCALL  syscallptr)
     SYSCALL wrapper;
 
     engine_syscall = syscallptr;
+    mod_lib = dlopen(mod_path, RTLD_NOW);
+    pyet_lib = dlopen(pyet_path, RTLD_NOW | RTLD_GLOBAL);
+    errstr = dlerror();
+
     if (errstr){
         std::cout << errstr << std::endl;
     }
+
     mod_dllEntry = (void  (*)( SYSCALL ) ) dlsym( mod_lib, "dllEntry" );
     pyet_dllEntry = (SYSCALL  (*)( SYSCALL ) ) dlsym( pyet_lib, "dllEntry" );
 
@@ -72,15 +82,15 @@ __attribute__((constructor))
 void dllConstructor (void)
 {
     char cwd[1024];
-    char pyet_path[2048];
-    char mod_path[2048];
-    getcwd(cwd, sizeof(cwd));
+    if (!library_loaded){
 
+    getcwd(cwd, sizeof(cwd));
     strcat(pyet_path, cwd);
     strcat(mod_path, cwd);
     strcat(pyet_path, "/pyet/pyet.so");
     strcat(mod_path, "/pyet/mod.so");
-    mod_lib = dlopen(mod_path, RTLD_NOW);
-    pyet_lib = dlopen(pyet_path, RTLD_NOW | RTLD_GLOBAL);
-    errstr = dlerror();
+    library_loaded = 1;
+
+    }
 }
+

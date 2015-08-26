@@ -18,6 +18,7 @@ Installation
     -Rename the qagame.mp.(i386/x86_64).so of your Enemy Territory mod to mod.so
     -Place it into pyet folder ("../enemyterritory/pyet/mod.so")
     -Copy qagame.mp.(i386/x86_64).so (the fake one) from the archive to your mod folder.
+    -Copy pyet.so from the archive to the pyet folder
     -Run etded as usual.
     
     

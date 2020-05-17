@@ -1,73 +1,93 @@
 Pyet3
 =====
 
-DOC   ===> http://pywet.sourceforge.net/html/
 
-Python scripting API for Wolfenstein:Enemy Territory 
+Python3 scripting API for Wolfenstein:Enemy Territory 
 
-    os : linux x86 / x64
-    Requirements : python 3.x , boost-python (on debian-based systems : 'apt-get install python3(-dev) libboost-python-dev)'
+This branch is an ongoing restructuration of the API to work with cffi and not boost::python anymore.
+cffi is more lightweight and has very few dependencies.
+Only a very few functionalities are currently supported such as listening to events and printing to the console :)
 
+
+
+BUILD
+============
+	sudo pip3 -r requirements.txt #note: this only installs cffi for python and its dependencies
+	cd build
+	./build.sh
 
 Installation
 ============
 
-     Pyet can be used with any EnemyTerritory mod.
+     Pyet can be used with any EnemyTerritory mod and with etlegacy on Linux x86 or x86_64.
 
-    -Place the pyet folder at the game root ("../enemyterritory/pyet")
-    -Rename the qagame.mp.(i386/x86_64).so of your Enemy Territory mod to mod.so
-    -Place it into pyet folder ("../enemyterritory/pyet/mod.so")
-    -Copy qagame.mp.(i386/x86_64).so (the fake one) from the archive to your mod folder.
-    -Copy pyet.so from the archive to the pyet folder
-    -Run etded as usual.
+    -Create a folder named pyet at the game root (enemyterritory/pyet) or (etlegacy/pyet) 
+    -Rename the qagame.mp.(i386/x86_64).so of your ET mod to mod.so
+    -Copy mod.so into the pyet folder
+    -Copy qagame.mp.(i386/x86_64).so from build/out directory to your mod folder.
+    -Copy build/out/plugins.py and build/out/pyet.so to the pyet directory 
+    -Run etded/etlded as usual.
     
     
 Get Started
 ===========
 
-    Addons are located in the pyet/addons subdirectory.
-    Create a file in this directory , for example my_addon.py.
-    In this addon you have access to a couple of classes to interact with the game:
-    
-        pyet.EtCaller: used to perform calls to the game api 
-            e.g: a = pyet.EtCaller().argv(0)
-            
-        pyet.EtTools: used to perform calls to some tool functions provided by the game 
-            e.g: a = pyet.EtTools().GetValueForKey(configstring, key)
-            
-        pyet.World: The entity management class 
-            e.g: entity = pyet.World(entitynum) ; a = entity.GetField(field)
-            
-        et.Listener: Each created class inheriting from et.Listener will catch events triggered by the api
-            see addons/example.py to understand
-        
-        et.Client: Client class to interact with clients userinfo (not finished)
-            e.g: a = Client(client_entity_num) ; a["name"] = "newname" //update in-game userinfo
-            
-    In order to load your addons on game initialization you must add 'set pyet_autoload addon1,addon2,..'
-    to your autoexec.cfg
-    
+Just look at plugins/plugins.py
+You can start to implement what to do on what event here.
+self.vmcalls allows you  to call the engine.
+Only one function is implemented for that version of Pyet3 currently:
+self.vmcalls.vm_Print(bytes)
+
+If you want to contribute or just hack and you want to extend the current functionalities here is what you can do:
+Create a new function under self.vmcalls (very easy !)
+
+edit src/vmcalls.c
+
+see the current function
+
+	bool vm_Print(const char *msg)
+	{
+		return VM_CALL(G_PRINT, msg);
+	}
+
+For it to be callable, it's just about adding it's prototype to ffi/ffi_build.py.
+
+	ffibuilder.cdef("""
+		bool vm_Print(const char *msg);
+	""")
 
 
+You can define whatever vmcall you want to implement in vmcalls, cffi will take take of the 
+bindings for you.
+
+so for exemple
+
+	ffibuilder.cdef("""
+		bool vm_Print(const char *msg);
+		bool vm_Error(const char *msg);
+	""")
+Or something like that.
+
+Next work for me is to reimplement those vmcalls and to handle entities or stuffs like that.
+
+
+Coding style
+================
+
+pep 8 for python.
+For C and other relevent files use linux kernel coding style which you can check with 
+		
+	./checkpatch.pl -F <files>
+    
 Troubleshooting
 ================
 
-    Pyet is at a very unstable stade, if you encounter segfaults check if pyet has access to ET files.
     You are free open issues on github, or to contact me 
     by mail (check my github profile).
        
-Communicate with pyet through the Console
-========
-
-    pyet_load or pl   [addon]
-    pyet_unload or pu [addon]
-    pyet_reload or pr [addon]
-    pyet_state or ps : list all the addons and listeners loaded.
   
 Doc
 ======
-SEE http://pywet.sourceforge.net/html/
-This api is very similar to LUA api, doc can easily be found on web.
 
     Events
     ======
@@ -81,10 +101,7 @@ This api is very similar to LUA api, doc can easily be found on web.
         ClientCommand(client)
         ClientThink(client)
         GameRunFrame(leveltime)
-        
-         
-    Constants from ET can be found in EtConstants.py    
-        
+
         
     
         

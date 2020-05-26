@@ -22,6 +22,7 @@ void *mod_lib;
 void *pyet_lib;
 
 
+__attribute__((visibility("default")))
 void dllEntry(SYSCALL syscallptr)
 {
 	void (*mod_dllEntry)(SYSCALL sys);
@@ -53,6 +54,7 @@ void dllEntry(SYSCALL syscallptr)
 	}
 }
 
+__attribute__((visibility("default")))
 intptr_t vmMain(intptr_t command, intptr_t arg0, intptr_t arg1, intptr_t arg2,
 	   intptr_t arg3, intptr_t arg4, intptr_t arg5, intptr_t arg6,
 	   intptr_t arg7, intptr_t arg8, intptr_t arg9, intptr_t arg10,

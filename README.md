@@ -2,24 +2,40 @@ Pyet3
 =====
 
 
-Python3 scripting API for Wolfenstein:Enemy Territory 
+Python3 scripting API for Wolfenstein:Enemy Territory  (**server-side**)
 
 This branch is an ongoing restructuration of the API to work with cffi and not boost::python anymore.
 cffi is more lightweight and has very few dependencies.
-Only a very few functionalities are currently supported such as listening to events and printing to the console :)
 
+ Pyet can be used with any vanilla EnemyTerritory mod and with ETlegacy on Linux x86(not tested) or x86_64
+No cross-compil yet so you'll have to do the x86 build on a 32-bit system or a chroot.
+
+You will have to have Python >= 3.5 on your machine.
 
 
 BUILD
 ============
-	sudo pip3 -r requirements.txt #note: this only installs cffi for python and its dependencies
-	cd build
-	./build.sh
+>git clone https://github.com/Ododo/Pyet3
+>git submodule init
+
+If you are building for vanilla ET:
+>git submodule update Ennemy-Territory
+
+If you are building for ETLegacy:
+>git submodule update etlegacy
+
+(This will clone the corresponding repository)
+
+Then install the requirements and build:
+
+>sudo pip3 -r requirements.txt #note: this only installs cffi for python and its dependencies
+>cd build
+>./build.sh [vanilla | etlegacy]
+
 
 Installation
 ============
-
-     Pyet can be used with any EnemyTerritory mod and with etlegacy on Linux x86 or x86_64.
+.
 
     -Create a folder named pyet at the game root (enemyterritory/pyet) or (etlegacy/pyet) 
     -Rename the qagame.mp.(i386/x86_64).so of your ET mod to mod.so
@@ -33,43 +49,72 @@ Get Started
 ===========
 
 Just look at plugins/plugins.py
-You can start to implement what to do on what event here.
-self.vmcalls allows you  to call the engine.
-Only one function is implemented for that version of Pyet3 currently:
-self.vmcalls.vm_Print(bytes)
+You can start to implement what to do on what event here by implementing them in the
+MyPlugin class. Those events will be triggered **before** being called in the real mod.
 
-If you want to contribute or just hack and you want to extend the current functionalities here is what you can do:
-Create a new function under self.vmcalls (very easy !)
+       
+  
+    Events
+    ======
+    def GameConsoleCommand(self):
+        pass
 
-edit src/vmcalls.c
+    def GameInit(self, leveltime, randomSeed, restart):
+        pass
 
-see the current function
+    def GameShutdown(self):
+        pass
 
-	bool vm_Print(const char *msg)
-	{
-		return VM_CALL(G_PRINT, msg);
-	}
+    def ClientConnect(self, client, firstTime, isBot):
+        pass
 
-For it to be callable, it's just about adding it's prototype to ffi/ffi_build.py.
+    def ClientBegin(self, client):
+        pass
 
-	ffibuilder.cdef("""
-		bool vm_Print(const char *msg);
-	""")
+    def ClientUserInfoChanged(self, client):
+        pass
+
+    def ClientDisconnect(self, client):
+        pass
+
+    def ClientCommand(self, client):
+        pass
+
+    def ClientThink(self, client):
+        pass
+
+    def GameRunFrame(self, leveltime):
+        pass
 
 
-You can define whatever vmcall you want to implement in vmcalls, cffi will take take of the 
-bindings for you.
 
-so for exemple
+###High level api
+**self.easy** is an intance of the EasyApi class (plugins/easyapi.py)  that provides a layer on top of the cffi
+api. It allows you to do the usual system calls of the server (trap_* functions in Lua api).
+Not all those syscalls are implemented yet. (please contribute or create an issue if you need a specific syscall).
 
-	ffibuilder.cdef("""
-		bool vm_Print(const char *msg);
-		bool vm_Error(const char *msg);
-	""")
-Or something like that.
 
-Next work for me is to reimplement those vmcalls and to handle entities or stuffs like that.
+    def ClientConnect(self, client, firstTime, isBot):
+        userinfo = self.easy.GetUserInfo(client)
 
+
+###Cffi level api:
+self.vmcalls allows you to call exported functions from c directly. (**vm_** prefix)
+Those functions are implemented in src/vmcalls.c
+Note that the types of the arguments have to be those defined by cffi.
+
+
+###Entities
+
+    def ClientBegin(self, client):
+        gent = self.entities.get(client) #  Get entity object
+        print(gent.classname)
+        gcli = gent.client #  Player specific
+        print(gcli.pers.netname)
+        
+ You can also set the entity attributes to another value. This will be effective in-memory,
+ Just keep in mind that those changes are totally out of control by the module or the server vm.
+Not all the types conversions are implemented and some fields are readonly.
 
 Coding style
 ================
@@ -84,23 +129,6 @@ Troubleshooting
 
     You are free open issues on github, or to contact me 
     by mail (check my github profile).
-       
-  
-Doc
-======
-
-    Events
-    ======
-        GameConsoleCommand()
-        GameInit(leveltime, randomSeed, restart)
-        GameShutdown()
-        ClientConnect(client, firstTime, isBot)
-        ClientBegin(client)
-        ClientUserInfoChanged(client)
-        ClientDisconnect(client)
-        ClientCommand(client)
-        ClientThink(client)
-        GameRunFrame(leveltime)
 
         
     

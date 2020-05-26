@@ -1,24 +1,37 @@
+import os
+import sys
+
 from inspect import signature
 
+from gentities import Gentities
+from easyapi import EasyApi
 
 class BasePlugin:
 
-    pyet_events = ("GameInit", "GameShutdown", "ClientConnect",
-                   "ClientBegin", "ClientUserInfoChanged", "ClientDisconnect",
-                   "ClientCommand", "ClientThink", "GameRunFrame",
-                   "GameConsoleCommand")
+    vmMain_events = (
+        "GameInit", "GameShutdown", "ClientConnect",
+        "ClientBegin", "ClientUserInfoChanged", "ClientDisconnect",
+        "ClientCommand", "ClientThink", "GameRunFrame",
+        "GameConsoleCommand"
+    )
+     
+    def __init__(self, ffi, lib):
+        self.ffi = ffi
+        self.lib = lib
+        self.easy = EasyApi(ffi, lib)
+        self.gentities = Gentities(ffi, lib)
 
-    def __init__(self, vmcalls):
-        self.vmcalls = vmcalls
-
-    def dispatcher(self, *args):
-        ev = BasePlugin.pyet_events[args[0]]
-        if hasattr(self, ev):
+    def dispatcher(self, event_type, *args):
+        if event_type == "vmMain":
+            ev = BasePlugin.vmMain_events[args[0]]
             f = getattr(self, ev)
             f(*args[1:len(signature(f).parameters)+1])
+        elif event_type == "modSyscall":
+            self.ModSyscall(*args)
 
-
-class MyPlugin(BasePlugin):
+    def ModSyscall(self, *args):
+        if args[0] == self.lib.G_LOCATE_GAME_DATA:
+            self.gentities.update(*args[1:4])
 
     def GameConsoleCommand(self):
         pass
@@ -51,5 +64,9 @@ class MyPlugin(BasePlugin):
         pass
 
 
-plugins = [MyPlugin]
-all = (plugins)
+
+class MyPlugin(BasePlugin):
+        def GameInit(self, leveltime, randomSeed, restart):
+            self.easy.Print("Greetings from my Plugin !")
+
+loaded = [MyPlugin]

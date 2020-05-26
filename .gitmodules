@@ -1,0 +1,6 @@
+[submodule "Enemy-Territory"]
+	path = Enemy-Territory
+	url = https://github.com/id-Software/Enemy-Territory
+[submodule "etlegacy"]
+	path = etlegacy
+	url = https://github.com/etlegacy/etlegacy

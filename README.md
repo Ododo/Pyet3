@@ -16,6 +16,7 @@ You will have to have Python >= 3.5 on your machine.
 BUILD
 ============
 >git clone https://github.com/Ododo/Pyet3
+
 >git submodule init
 
 If you are building for vanilla ET:
@@ -29,7 +30,9 @@ If you are building for ETLegacy:
 Then install the requirements and build:
 
 >sudo pip3 -r requirements.txt #note: this only installs cffi for python and its dependencies
+
 >cd build
+
 >./build.sh [vanilla | etlegacy]
 
 
@@ -88,7 +91,7 @@ MyPlugin class. Those events will be triggered **before** being called in the re
 
 
 
-###High level api
+### High level api
 **self.easy** is an intance of the EasyApi class (plugins/easyapi.py)  that provides a layer on top of the cffi
 api. It allows you to do the usual system calls of the server (trap_* functions in Lua api).
 Not all those syscalls are implemented yet. (please contribute or create an issue if you need a specific syscall).
@@ -98,13 +101,13 @@ Not all those syscalls are implemented yet. (please contribute or create an issu
         userinfo = self.easy.GetUserInfo(client)
 
 
-###Cffi level api:
+### Cffi level api:
 self.vmcalls allows you to call exported functions from c directly. (**vm_** prefix)
 Those functions are implemented in src/vmcalls.c
 Note that the types of the arguments have to be those defined by cffi.
 
 
-###Entities
+### Entities
 
     def ClientBegin(self, client):
         gent = self.entities.get(client) #  Get entity object

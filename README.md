@@ -7,11 +7,11 @@ Python3 scripting API for Wolfenstein:Enemy Territory  (**server-side**)
 This branch is an ongoing restructuration of the API to work with cffi and not boost::python anymore.
 cffi is more lightweight and has very few dependencies.
 
- Pyet can be used with any vanilla EnemyTerritory mod and with ETlegacy on Linux x86(not tested) or x86_64
+Pyet can be used with any vanilla EnemyTerritory mod and with ETlegacy on Linux x86(not tested) or x86_64
+
 No cross-compil yet so you'll have to do the x86 build on a 32-bit system or a chroot.
 
 You will have to have Python >= 3.5 on your machine.
-
 
 BUILD
 ============
@@ -44,7 +44,7 @@ Installation
     -Rename the qagame.mp.(i386/x86_64).so of your ET mod to mod.so
     -Copy mod.so into the pyet folder
     -Copy qagame.mp.(i386/x86_64).so from build/out directory to your mod folder.
-    -Copy build/out/plugins.py and build/out/pyet.so to the pyet directory 
+    -Copy build/out/plugins dir and build/out/_pyet.so into the pyet directory 
     -Run etded/etlded as usual.
     
     

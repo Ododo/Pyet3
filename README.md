@@ -20,7 +20,7 @@ BUILD
 >git submodule init
 
 If you are building for vanilla ET:
->git submodule update Ennemy-Territory
+>git submodule update Enemy-Territory
 
 If you are building for ETLegacy:
 >git submodule update etlegacy

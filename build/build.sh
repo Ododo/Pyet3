@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 if [ "$1" = "etlegacy" ]; then
@@ -12,11 +14,10 @@ echo building option $BUILD_WITH
 gcc -c -Wall -Werror -fpic ../src/wrapper.c
 gcc -shared -o qagame.mp.`uname -m`.so wrapper.o
 
-
-rm -R out/*
+rm -Rf out/*
 cp ../ffi/ffi_build.py .
 python3 ffi_build.py $BUILD_WITH
-rm ../src/*.o
+rm -Rf ../src/*.o
 mkdir -p out
 cp _pyet.so out/
 cp qagame.mp.`uname -m`.so out/
